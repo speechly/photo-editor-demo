@@ -1,0 +1,39 @@
+{
+  "name": "image-editor",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "react-scripts start"
+  },
+  "author": "Speechly",
+  "license": "ISC",
+  "dependencies": {
+    "@speechly/browser-client": "0.3.0",
+    "@types/classnames": "^2.2.10",
+    "classnames": "^2.2.6",
+    "fabric": "3.6.0",
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1",
+    "react-router-dom": "^5.1.2",
+    "react-scripts": "^3.4.1",
+    "tui-image-editor": "^3.9.0"
+  },
+  "devDependencies": {
+    "@material-ui/core": "^4.9.9",
+    "typescript": "^3.8.3",
+    "node-sass": "^4.13.1"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}
