@@ -108,12 +108,24 @@ $light-shadow: 3px 3px 16px 0px rgba(207, 207, 207, 1);
     }
 }
 
+.HelpText {
+  color: #787878;
+}
+
 .ApiBrowser {
   width: 100%;
   max-height: 70vh;
   display: grid;
   grid-template-columns: repeat(10, 10%);
   grid-template-rows: repeat(10, 10%);
+  &__onboardingmessage {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 22px;
+    text-align: center;
+  }
 }
 
 .AudioContexts {
@@ -121,6 +133,15 @@ $light-shadow: 3px 3px 16px 0px rgba(207, 207, 207, 1);
   grid-column-end: 11;
   grid-row-start: 1;
   grid-row-end: 10;
+
+  &__placeholder {
+    display: flex;
+    justify-content: center;
+    align-content: center;
+    margin-top: 20vh;
+    padding: 1rem;
+    text-align: center;
+  }
 }
 
 .Intents {
@@ -131,42 +152,44 @@ $light-shadow: 3px 3px 16px 0px rgba(207, 207, 207, 1);
   }
 }
 
-.function-button {
-  outline: none;
-  -webkit-tap-highlight-color: transparent;
-  cursor: pointer;
-  background: none;
-  border: none;
-  width: 100%;
-  height: 100%;
-  margin-left: auto;
-  margin-right: auto;
-  transform-origin: bottom center;
-  @media only screen and (min-width: 768px) {
-    width: 28%;
+.Microphone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 5vh !important;
+
+  &__loading {
+    position: absolute;
   }
 
-  @media only screen and (min-width: 1024px) {
-    width: 20%;
+  &__start {
+    border-radius: 1.5rem !important;
+    padding: 1rem !important;
   }
 
-  &:hover {
-    svg {
-      transform: scale(1.1);
-    }
-  }
-  svg {
-    fill: $function-button-fill;
-    width: 100%;
+  &__button {
+    display: inline-flex;
     outline: none;
-    transition: all 0.5s;
-    transition-timing-function: ease-in-out;
-  }
-  &__small {
-    display: flex;
-    height: 100%;
-    justify-content: center;
-    width: 100%;
+    -webkit-tap-highlight-color: transparent;
+    cursor: pointer;
+    background: none;
+    border: none;
+    margin: auto;
+    transform-origin: bottom center;
+    width: 50%;
+
+    svg {
+      width: 100%;
+      outline: none;
+      transition: all 0.5s;
+      transition-timing-function: ease-in-out;
+      transform-origin: bottom center;
+      overflow: visible;
+      max-height: 7vh;
+      fill: $function-button-fill;
+    }
+
     object {
       margin-top: 2vh;
       margin-bottom: 3vh;
@@ -175,25 +198,56 @@ $light-shadow: 3px 3px 16px 0px rgba(207, 207, 207, 1);
       width: 100%;
       max-height: 5vh;
     }
-    svg {
-      overflow: visible;
-      max-height: 7vh;
-      fill: $function-button-fill;
-    }
-  }
 
-  &__active {
-    transform-origin: bottom center;
-    svg {
-      fill: $function-button-fill;
-      transform-origin: bottom center;
+    @media only screen and (min-width: 768px) {
+      width: 28%;
     }
-    &-pressed {
+
+    @media only screen and (min-width: 1024px) {
+      width: 20%;
+    }
+
+    &:hover {
+      svg {
+        transform: scale(1.1);
+      }
+    }
+
+    &__loading {
+      padding: 2vh 3vh !important;
+    }
+
+    &__active {
       svg {
         transform-origin: bottom center;
         fill: $mic-fill-color;
-        transform: scale(1.8) !important; //important is required to override the more specific :hover selector
+        transform: scale(1.8) !important; // important is required to override the more specific :hover selector
       }
+    }
+
+    &__inactive {
+      transform: none;
+      opacity: 0.3;
+
+      svg {
+        transition: none;
+      }
+    }
+  }
+
+  &__help {
+    display: inline-flex;
+    margin: 1vh;
+    text-align: center;
+    transition: all 0.5s;
+
+    /* smartphones, touchscreens */
+    @media (hover: none) and (pointer: coarse) {
+      display: none;
+    }
+
+    &--hidden {
+      opacity: 0;
     }
   }
 }

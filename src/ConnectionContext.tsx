@@ -37,17 +37,16 @@ type IConnectionContextState = {
   intents: Intent[];
   entities: Entity[];
   brightness: number;
-  stopSpeaking: (event: any) => void;
-  startSpeaking: (event: any) => void;
+  stopContext: (event: any) => void;
+  startContext: (event: any) => void;
   clearList: () => void;
   clearListConfirmed: () => void;
-  client?: Client;
   clientState: ClientState;
 };
 
 const defaultState: IConnectionContextState = {
-  stopSpeaking: (_event: Event) => {},
-  startSpeaking: (_event: Event) => {},
+  stopContext: (_event: Event) => {},
+  startContext: (_event: Event) => {},
   clearList: () => {},
   clearListConfirmed: () => {},
   intents: [],
@@ -64,9 +63,7 @@ const ConnectionContext = React.createContext<IConnectionContextState>(defaultSt
 class ConnectionContextProvider extends Component<IConnectionContextProps, IConnectionContextState> {
   constructor(props: any) {
     super(props);
-    this.state = defaultState;
-  }
-  componentDidMount() {
+
     const clientBasicParams = {
       appId: this.props.appId,
       language: this.props.language
@@ -77,21 +74,13 @@ class ConnectionContextProvider extends Component<IConnectionContextProps, IConn
     // };
     // const clientInitParams = { ...clientBasicParams, ...stagingParams };
     console.log("Initializing client", clientBasicParams);
-    const client = new Client(clientBasicParams);
+    this.client = new Client(clientBasicParams);
+    this.client.onSegmentChange(this.updateStateBySegmentChange);
+    this.client.onStateChange(this.browserClientStateChanged);
+    this.client.onEntity(this.onEntity);
+    this.client.onIntent(this.onIntent);
 
-    client.onSegmentChange(this.updateStateBySegmentChange);
-    client.onStateChange(this.stateChanged);
-    client.onEntity(this.onEntity);
-    client.onIntent(this.onIntent)
-    client.initialize((err?: Error) => {
-      if (err) {
-        console.error("Error initializing Speechly client:", err);
-        return;
-      }
-    });
-    this.setState({
-      client 
-    });
+    this.state = defaultState;
   }
 
   onEntity = (contextId: string, segmentId: number, browserClientEntity: BrowserClientEntity) => {
@@ -114,15 +103,18 @@ class ConnectionContextProvider extends Component<IConnectionContextProps, IConn
     this.setState({ intents: [...this.state.intents, intent] });
   };
 
+  browserClientStateChanged = (clientState: ClientState) => {
+    this.setState({ clientState });
+  };
+
   updateStateBySegmentChange: SegmentChangeCallback = (segment: Segment) => {
+    if (!segment.isFinal) {
+      return
+    }
     if (this.state.intents.length > 0) {
       const intent = this.state.intents[0];
       if (intent.intent === "undo") {
         // UNDO
-        this.setState({
-          ...defaultState,
-          client: this.state.client
-        })
         const something2undo = !this.props.imageEditor.isEmptyUndoStack();
         if (something2undo) {
           this.props.imageEditor.undo().then((response) => console.log(response)).catch((error) => console.error(error))
@@ -135,10 +127,6 @@ class ConnectionContextProvider extends Component<IConnectionContextProps, IConn
         } 
       } else if (intent.intent === "crop") {
         const directions = this.state.entities.filter(item => item.type === "direction")
-        this.setState({
-          ...defaultState,
-          client: this.state.client
-        })
 
         const canvasSize = this.props.imageEditor.getCanvasSize();
         const width = canvasSize.width;
@@ -157,22 +145,22 @@ class ConnectionContextProvider extends Component<IConnectionContextProps, IConn
               this.cropTo(
                 0, 
                 0, 
-                Math.round(width * 0.6), 
-                Math.round(height * 0.6))
+                Math.round(width * 0.5), 
+                Math.round(height * 0.5))
               break;
             case 'top right':
               this.cropTo(
-                width - Math.round(width * 0.6), 
+                width - Math.round(width * 0.5), 
                 0, 
-                Math.round(width * 0.6), 
-                Math.round(height * 0.6))
+                Math.round(width * 0.5), 
+                Math.round(height * 0.5))
               break
             case 'bottom left':
               this.cropTo(
                 0, 
-                height - Math.round(width * 0.6), 
-                Math.round(width * 0.6), 
-                Math.round(height * 0.6))
+                height - Math.round(width * 0.5), 
+                Math.round(width * 0.5), 
+                Math.round(height * 0.5))
               break
             default:
               this.cropTo(
@@ -184,6 +172,11 @@ class ConnectionContextProvider extends Component<IConnectionContextProps, IConn
         }
       }
     }
+    this.setState({
+      ...defaultState,
+      clientState: this.state.clientState,
+      brightness: this.state.brightness
+    })
   };
 
   cropTo(left: number, top: number, width: number, height: number) {
@@ -197,35 +190,30 @@ class ConnectionContextProvider extends Component<IConnectionContextProps, IConn
     const filters = ["grayscale", "sepia", "blur","emboss", "invert", "sharpen"]
     
     if (filters.includes(imageFilter)) {
-      this.setState({
-        ...defaultState,
-        client: this.state.client
-      })
-
       this.applyFilter(imageFilter)
     } else if (imageFilter === "darker" || imageFilter === "brighter") {
       const change = (imageFilter == "darker") ? -0.2 : 0.2
       const newBrightness = this.state.brightness + change;
       this.setState({
         ...defaultState,
-        client: this.state.client,
+        clientState: this.state.clientState,
         brightness: newBrightness
       })
       this.applyFilter("brightness", {brightness: newBrightness})
     } else if (imageFilter === "brightness") {
-      this.setState({
-        ...defaultState,
-        client: this.state.client
-      })
-      
-      var brightnessScale = 0.1;
+      var newBrightness = 0.1;
       const scales = this.state.entities.filter(item => item.type === "scale")
       if (scales.length > 0) {
           const scale = parseInt(scales[0].value.toLowerCase(), 10);
           if (!scale) return;
-          brightnessScale = scale / 100;
+          newBrightness = scale / 100;
       }
-      this.applyFilter(imageFilter, {brightness: brightnessScale})
+      this.setState({
+        ...defaultState,
+        clientState: this.state.clientState,
+        brightness: newBrightness
+      })
+      this.applyFilter(imageFilter, {brightness: newBrightness})
     }
   }
  
@@ -241,17 +229,33 @@ class ConnectionContextProvider extends Component<IConnectionContextProps, IConn
     this.setState({ clientState });
   };
 
-  startSpeaking = (event: any) => {
-    const { client } = this.state;
-    client?.startContext((err?: Error) => {
-      if (err) {
-        console.error("Could not start recording", err);
-        return;
-      }
-    });
+  startContext = (event: any) => {
+    // This is a bit of a hacky way to initialize the client,
+    // since it means that the first call to `startSpeaking` won't actually start a context.
+    //
+    // However, this makes it a bit easier to use by the Mic, so I'll leave it as it is.
+    if (this.state.clientState === ClientState.Disconnected) {
+      this.client.initialize((err?: Error) => {
+        if (err) {
+          console.error("Error initializing Speechly client:", err);
+          return;
+        }
+      });
+
+      return;
+    }
+
+    if (this.state.clientState === ClientState.Connected) {
+      this.client.startContext((err?: Error) => {
+        if (err) {
+          console.error("Could not start recording", err);
+          return;
+        }
+      });
+    }
   };
 
-  stopSpeaking = (event: any) => {
+  stopContext = (event: any) => {
     this.toggleRecordButtonState(false);
     const { recordButtonIsPressedStarted, recordButtonIsPressedStopped } = this.state;
 
@@ -273,12 +277,34 @@ class ConnectionContextProvider extends Component<IConnectionContextProps, IConn
   };
 
   stopRecording = (event: any) => {
-    this.state.client?.stopContext((err?: Error) => {
+    if (this.state.clientState !== ClientState.Recording) {
+      return;
+    }
+
+    this.client.stopContext((err?: Error) => {
       if (err) {
         console.error("Could not stop recording", err);
         return;
       }
     });
+  };
+
+  readonly closeClient = () => {
+    if (this.state.clientState < ClientState.Connected) {
+      return;
+    }
+
+    // FIXME: currently browser client can throw when being closed.
+    // This should be fixed in the client, but for now, just going to put this band-aid here.
+    try {
+      this.client.close((err?: Error) => {
+        if (err !== undefined) {
+          console.error("Could not close client", err);
+        }
+      });
+    } catch (err) {
+      console.error("Could not close client", err);
+    }
   };
 
   clearList = () => {
@@ -290,8 +316,9 @@ class ConnectionContextProvider extends Component<IConnectionContextProps, IConn
       <ConnectionContext.Provider
         value={{
           ...this.state,
-          startSpeaking: this.startSpeaking,
-          stopSpeaking: this.stopSpeaking
+          startContext: this.startContext,
+          stopContext: this.stopContext,
+          closeClient: this.closeClient
         }}
       >
         {this.props.children}

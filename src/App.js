@@ -51,7 +51,7 @@ const App = () => {
         const editor = new ImageEditor(imageEditorRef.current, {
             includeUI: {
                 loadImage: {
-                    path: 'microphone.jpg',
+                    path: 'microphone_smaller.jpg',
                     name: 'microphone'
                 },
                 theme: myTheme,
@@ -78,15 +78,16 @@ const App = () => {
             <div ref={imageEditorRef} />
             <ConnectionContextProvider appId={appId} language={language} imageEditor={imageEditorInstance} >
                 <ConnectionContext.Consumer>
-                    {({ stopSpeaking, startSpeaking, clientState }) => {
+                    {({ stopContext, startContext, closeClient, clientState }) => {
                         return (
-                            <div className="Playground__mic">
-                            <Mic onUp={stopSpeaking} onDown={startSpeaking} clientState={clientState} imageEditor={imageEditorInstance} />
-                            <div
-                                className={`Playground__mic__info ${
-                                clientState === ClientState.Recording ? "Playground__mic__info--hidden" : ""
-                                }`}
-                            >
+                            <div>
+                                <Mic 
+                                onUp={stopContext}
+                                onDown={startContext}
+                                onUnmount={closeClient}
+                                clientState={clientState}
+                                classNames="Playground__mic" />
+                                
                                 <i><b>Try out these:</b></i>
                                 <ul>
                                     <li>add grayscale</li>
@@ -95,7 +96,6 @@ const App = () => {
                                     <li>what if we magnify a bit</li>
                                     <li>magnify to the bottom left corner</li>
                                 </ul>
-                            </div>
                             </div>
                         );
                     }}
