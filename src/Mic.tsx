@@ -89,12 +89,7 @@ export class Mic extends React.Component<MicProps, {}> {
     const clientConnecting = this.props.clientState === ClientState.Connecting;
     const clientConnected = this.props.clientState >= ClientState.Connected;
 
-    const initText = clientConnecting ? "" : "Tap to start";
     const rootClassName = `Microphone ${this.props.classNames}`;
-    const initClassName = classNames("Microphone__start", {
-      Microphone__button__loading: clientConnecting,
-      hidden: clientConnected
-    });
 
     const micClassName = classNames("Microphone__button", {
       hidden: !clientConnected,
@@ -108,17 +103,7 @@ export class Mic extends React.Component<MicProps, {}> {
 
     return (
       <div className={rootClassName} ref={this.rootDiv}>
-        <Button
-          className={initClassName}
-          disabled={clientConnecting}
-          variant="contained"
-          color="primary"
-          size="large"
-          title={initText}
-          disableElevation
-        >
-          {initText}
-        </Button>
+        <div style={{height: '50px'}}></div>
         {clientConnecting && <CircularProgress size="3vh" className="Microphone__loading" />}
         <div className={micClassName}>
           <object>

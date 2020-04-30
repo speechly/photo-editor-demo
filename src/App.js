@@ -90,9 +90,11 @@ const App = () => {
                                 
                                 <i><b>Try out these:</b></i>
                                 <ul>
-                                    <li>add grayscale</li>
+                                    <li>I want it black and white (grayscale filter)</li>
                                     <li>no I don't like that</li>
-                                    <li>I want it darker</li>
+                                    <li>why don't you add old image style (sepia filter)</li>
+                                    <li>take off light</li>
+                                    <li>add more luminosity</li>
                                     <li>what if we magnify a bit</li>
                                     <li>magnify to the bottom left corner</li>
                                 </ul>

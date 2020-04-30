@@ -114,17 +114,19 @@ class ConnectionContextProvider extends Component<IConnectionContextProps, IConn
     if (this.state.intents.length > 0) {
       const intent = this.state.intents[0];
       if (intent.intent === "undo") {
-        // UNDO
-        const something2undo = !this.props.imageEditor.isEmptyUndoStack();
-        if (something2undo) {
-          this.props.imageEditor.undo().then((response) => console.log(response)).catch((error) => console.error(error))
-        }
-      } else if (intent.intent === "add_filter" && this.state.entities.length > 0) {
-        const imageFilters = this.state.entities.filter(item => item.type === "filter")
-        if (imageFilters.length > 0) {
-          const imageFilter = imageFilters[0].value.toLowerCase(); // take only first one
-          this.chooseFilterFromEntity(imageFilter)
-        } 
+        this.undoIntent()
+      } else if (intent.intent == "add_grayscale_filter") {
+        this.applyFilter("grayscale")
+      } else if (intent.intent == "add_sepia_filter") {
+        this.applyFilter("sepia")
+      } else if (intent.intent == "increase_luminosity") {
+        const scales = this.state.entities.filter(item => item.type === "scale")
+        var change = 0.2;
+        this.changeLuminosity(scales, change)
+      } else if (intent.intent == "decrease_luminosity") {
+        const scales = this.state.entities.filter(item => item.type === "scale")
+        var change = -0.2;
+        this.changeLuminosity(scales, change)
       } else if (intent.intent === "crop") {
         const directions = this.state.entities.filter(item => item.type === "direction")
 
@@ -178,43 +180,37 @@ class ConnectionContextProvider extends Component<IConnectionContextProps, IConn
       brightness: this.state.brightness
     })
   };
+  changeLuminosity(scales, change) {
+    if (scales.length > 0) {
+      change = parseInt(scales[0].value.toLowerCase(), 10);
+    }
+    const newBrightness = this.state.brightness + change;
+    this.setState({
+      ...defaultState,
+      clientState: this.state.clientState,
+      brightness: newBrightness
+    })
+    this.applyFilter("brightness", {brightness: newBrightness})
+  }
+
+  undoIntent() {
+    const something2undo = !this.props.imageEditor.isEmptyUndoStack();
+    if (something2undo) {
+      this.props.imageEditor.undo().then((response) => {
+        console.log(response)
+        if (response.options) {
+          this.setState({
+            brightness: this.state.brightness - (response.options.brightness || 0)
+          })
+        }
+      }).catch((error) => console.error(error))
+    }
+  }
 
   cropTo(left: number, top: number, width: number, height: number) {
     this.props.imageEditor.crop(
       {left: left, top: top, width: width, height: height}
     ).then((response) => console.log(response)).catch((error) => console.error(error))
-  }
-
-  chooseFilterFromEntity(imageFilter: string) {
-    console.log("ImageFilter candidate: " + imageFilter)
-    const filters = ["grayscale", "sepia", "blur","emboss", "invert", "sharpen"]
-    
-    if (filters.includes(imageFilter)) {
-      this.applyFilter(imageFilter)
-    } else if (imageFilter === "darker" || imageFilter === "brighter") {
-      const change = (imageFilter == "darker") ? -0.2 : 0.2
-      const newBrightness = this.state.brightness + change;
-      this.setState({
-        ...defaultState,
-        clientState: this.state.clientState,
-        brightness: newBrightness
-      })
-      this.applyFilter("brightness", {brightness: newBrightness})
-    } else if (imageFilter === "brightness") {
-      var newBrightness = 0.1;
-      const scales = this.state.entities.filter(item => item.type === "scale")
-      if (scales.length > 0) {
-          const scale = parseInt(scales[0].value.toLowerCase(), 10);
-          if (!scale) return;
-          newBrightness = scale / 100;
-      }
-      this.setState({
-        ...defaultState,
-        clientState: this.state.clientState,
-        brightness: newBrightness
-      })
-      this.applyFilter(imageFilter, {brightness: newBrightness})
-    }
   }
  
   applyFilter = (filter: string, options = {}) => {
