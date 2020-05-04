@@ -52,12 +52,12 @@ const App = () => {
             includeUI: {
                 loadImage: {
                     path: 'microphone_smaller.jpg',
-                    name: 'microphone'
+                    name: 'Microphone'
                 },
                 theme: myTheme,
                 menu: [],
                 uiSize: {
-                    height: '800px'
+                    height: '950px'
                 },
                 menuBarPosition: 'rights'
             },
