@@ -1,7 +1,7 @@
 import classNames from "classnames";
 import React from "react";
 import { ClientState } from "@speechly/browser-client";
-import { CircularProgress, Button } from "@material-ui/core";
+import { CircularProgress } from "@material-ui/core";
 
 let passiveSupported = false;
 try {

@@ -109,18 +109,16 @@ class ConnectionContextProvider extends Component<IConnectionContextProps, IConn
       const intent = this.state.intents[0];
       if (intent.intent === "undo") {
         this.undoIntent()
-      } else if (intent.intent == "add_grayscale_filter") {
+      } else if (intent.intent === "add_grayscale_filter") {
         this.applyFilter("grayscale")
-      } else if (intent.intent == "add_sepia_filter") {
+      } else if (intent.intent === "add_sepia_filter") {
         this.applyFilter("sepia")
-      } else if (intent.intent == "increase_luminosity") {
+      } else if (intent.intent === "increase_luminosity") {
         const scales = this.state.entities.filter(item => item.type === "scale")
-        var change = 0.2;
-        this.changeLuminosity(scales, change)
-      } else if (intent.intent == "decrease_luminosity") {
+        this.changeLuminosity(scales,  0.2)
+      } else if (intent.intent === "decrease_luminosity") {
         const scales = this.state.entities.filter(item => item.type === "scale")
-        var change = -0.2;
-        this.changeLuminosity(scales, change)
+        this.changeLuminosity(scales, -0.2)
       } else if (intent.intent === "crop") {
         const directions = this.state.entities.filter(item => item.type === "direction")
 
