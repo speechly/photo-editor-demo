@@ -1,9 +1,8 @@
-import "./ApiBrowser.scss";
+import "./Styles.scss";
 import React, { useEffect, useRef, useState } from "react";
 import 'tui-image-editor/dist/tui-image-editor.css'
 import { Mic } from "./Mic";
 import ConnectionContext, { ConnectionContextProvider } from "./ConnectionContext";
-import { ClientState } from "@speechly/browser-client";
 import ImageEditor from 'tui-image-editor';
 
 
@@ -42,9 +41,10 @@ const myTheme = {
 const App = () => {
     const imageEditorRef = useRef()
     const [imageEditorInstance, setImageEditorInstance] = useState()
-    //const appId = "4819d833-5c3c-460b-a17f-ba20af6b2f9a";
-    //const appId = "3c8f7acc-3641-466d-96ca-fb0d6f956cbe";
-    const appId = "1648fbe6-5c0b-4fca-a962-1bb42a4c4437";
+    const appId = process.env.REACT_APP_SPEECLY_APP_ID;
+    if(!appId) {
+        throw new Error('REACT_APP_SPEECLY_APP_ID environment variable is undefined!')
+    }
     const language = "en-US";
 
     useEffect(() => {

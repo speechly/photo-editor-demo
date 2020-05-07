@@ -3,9 +3,6 @@ import React from "react";
 import { ClientState } from "@speechly/browser-client";
 import { CircularProgress, Button } from "@material-ui/core";
 
-// As we need to prevent browser default behavior on touch start/event events, we need to do some tricky stuff
-// because of: https://github.com/facebook/react/issues/8968
-// https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener#Safely_detecting_option_support
 let passiveSupported = false;
 try {
   const options = {

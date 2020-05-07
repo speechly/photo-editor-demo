@@ -9,7 +9,6 @@ import {
   Intent as BrowserClientIntent
 } from "@speechly/browser-client";
 import ImageEditor from 'tui-image-editor';
-import getEditDistance from "./levenhstein"
 
 interface Entity extends BrowserClientEntity {
     contextId: string;
@@ -21,7 +20,6 @@ interface Intent extends BrowserClientIntent {
   segmentId: number;
 }
   
-
 type IConnectionContextProps = {
   appId: string;
   language: string;
@@ -68,11 +66,7 @@ class ConnectionContextProvider extends Component<IConnectionContextProps, IConn
       appId: this.props.appId,
       language: this.props.language
     };
-    // const stagingParams = {
-    //   url: "wss://staging.speechly.com/ws",
-    //   debug: true
-    // };
-    // const clientInitParams = { ...clientBasicParams, ...stagingParams };
+
     console.log("Initializing client", clientBasicParams);
     this.client = new Client(clientBasicParams);
     this.client.onSegmentChange(this.updateStateBySegmentChange);
@@ -226,10 +220,6 @@ class ConnectionContextProvider extends Component<IConnectionContextProps, IConn
   };
 
   startContext = (event: any) => {
-    // This is a bit of a hacky way to initialize the client,
-    // since it means that the first call to `startSpeaking` won't actually start a context.
-    //
-    // However, this makes it a bit easier to use by the Mic, so I'll leave it as it is.
     if (this.state.clientState === ClientState.Disconnected) {
       this.client.initialize((err?: Error) => {
         if (err) {
@@ -237,7 +227,6 @@ class ConnectionContextProvider extends Component<IConnectionContextProps, IConn
           return;
         }
       });
-
       return;
     }
 
@@ -289,9 +278,6 @@ class ConnectionContextProvider extends Component<IConnectionContextProps, IConn
     if (this.state.clientState < ClientState.Connected) {
       return;
     }
-
-    // FIXME: currently browser client can throw when being closed.
-    // This should be fixed in the client, but for now, just going to put this band-aid here.
     try {
       this.client.close((err?: Error) => {
         if (err !== undefined) {
