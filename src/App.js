@@ -41,11 +41,14 @@ const myTheme = {
 const App = () => {
     const imageEditorRef = useRef()
     const [imageEditorInstance, setImageEditorInstance] = useState()
-    const appId = process.env.REACT_APP_SPEECLY_APP_ID;
+    const appId = process.env.REACT_APP_APP_ID;
     if(!appId) {
-        throw new Error('REACT_APP_SPEECLY_APP_ID environment variable is undefined!')
+        throw new Error('REACT_APP_APP_ID environment variable is undefined!')
     }
-    const language = "en-US";
+    const language = process.env.REACT_APP_LANGUAGE;
+    if(!language) {
+        throw new Error('REACT_APP_LANGUAGE environment variable is undefined!')
+    }
 
     useEffect(() => {
         const editor = new ImageEditor(imageEditorRef.current, {
