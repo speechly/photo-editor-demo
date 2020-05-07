@@ -1,7 +1,9 @@
 
 ## Speechly photo editor example
 
-This is an simple photo editing application which can edit the brightness, add and remove filters and crop images, using Speechly API.
+[![License](http://img.shields.io/:license-mit-blue.svg)](LICENSE)
+
+This is an simple photo editing application which can edit the brightness, add and remove filters and crop images, using voice.
 
 Built with:
 - [speechly-browser-client](https://github.com/speechly/browser-client)
@@ -20,5 +22,6 @@ export REACT_APP_APP_ID="your-app-id"
 # Configure your Speechly app language
 export REACT_APP_LANGUAGE="your-app-language"
 
+# Open http://localhost:3000 to view it in the browser.
 npm run start
 ```
