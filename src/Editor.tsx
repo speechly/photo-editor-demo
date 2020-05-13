@@ -104,7 +104,7 @@ const Editor = (props: NavLinkProps) => {
                 menu: [],
                 menuBarPosition: 'rights'
             },
-            cssMaxHeight: height - 100,
+            cssMaxHeight: Math.min(height - 50, 450),
             cssMaxWidth: width,
             selectionStyle: {
                 cornerSize: 50,
@@ -112,12 +112,11 @@ const Editor = (props: NavLinkProps) => {
             },
             usageStatistics: false
         });
-        //resizeCanvasDimension
         setImageEditorInstance(editor)
-    }, [imageEditorRef, imagePath]);
+    }, [imageEditorRef, imagePath, width, height]);
     
     return (
-        <div style={{width: width, height: height - 300}}>
+        <div style={{width: width, height: Math.min(height, 500)}}>
                 <div ref={imageEditorRef} />
                 <section className="app">
                     <div ref={transcriptDivRef} />

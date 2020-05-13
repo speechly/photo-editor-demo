@@ -1,5 +1,5 @@
 import "./layout.css";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import {Link} from "react-router-dom";
 import logo from './img/logo.png';
 
