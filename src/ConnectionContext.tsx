@@ -24,6 +24,7 @@ type IConnectionContextProps = {
   appId: string;
   language: string;
   imageEditor: ImageEditor;
+  transcriptDiv: HTMLDivElement;
 };
 type IConnectionContextState = {
   isTapping: boolean;
@@ -37,6 +38,7 @@ type IConnectionContextState = {
   brightness: number;
   stopContext: (event: any) => void;
   startContext: (event: any) => void;
+  closeClient: () => void;
   clearList: () => void;
   clearListConfirmed: () => void;
   clientState: ClientState;
@@ -102,6 +104,7 @@ class ConnectionContextProvider extends Component<IConnectionContextProps, IConn
   };
 
   updateStateBySegmentChange: SegmentChangeCallback = (segment: Segment) => {
+    this.updateWords(segment.words);
     if (!segment.isFinal) {
       return
     }
@@ -289,6 +292,14 @@ class ConnectionContextProvider extends Component<IConnectionContextProps, IConn
 
   clearList = () => {
     this.setState({ isClearConfirmOpen: true });
+  };
+
+  updateWords = (words: Word[]) => {
+    const transcriptDiv = this.props.transcriptDiv;
+  
+    transcriptDiv.innerHTML = words
+      .map((word) => (word.isFinal ? `<b>${word.value}</b>` : word.value))
+      .join(" ");
   };
 
   render() {
