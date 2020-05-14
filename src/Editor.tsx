@@ -24,8 +24,8 @@ function useWindowSize() {
 const myTheme = {
     // Theme object to extends default dark theme.
     'common.bi.image': 'https://www.speechly.com/images/logo-speechly.png',
-    'common.bisize.width': '251px',
-    'common.bisize.height': '50px',
+    'common.bisize.width': '0px',
+    'common.bisize.height': '0px',
     'common.backgroundImage': 'none',
     'common.backgroundColor': 'white',
     'common.border': '0px',
@@ -102,7 +102,7 @@ const Editor = (props: NavLinkProps) => {
                 },
                 theme: myTheme,
                 menu: [],
-                menuBarPosition: 'rights'
+                menuBarPosition: 'top'
             },
             cssMaxHeight: Math.min(height - 50, 450),
             cssMaxWidth: width,
@@ -112,6 +112,16 @@ const Editor = (props: NavLinkProps) => {
             },
             usageStatistics: false
         });
+
+        const canvases = imageEditorRef.current?.getElementsByTagName("canvas") as HTMLCollectionOf<HTMLCanvasElement>;
+        const canvasCount = canvases?.length || 0;
+        for (var i = 0; i < canvasCount; i++) {
+            const canvas = canvases[i] as HTMLCanvasElement;
+            canvas.onwheel = function(event){
+                event.preventDefault();
+            };
+        }
+
         setImageEditorInstance(editor)
     }, [imageEditorRef, imagePath, width, height]);
     

@@ -142,12 +142,45 @@ body {
   border-radius: 0 0 34px 34px;
   z-index: -1;
 }
-
+.tui-image-editor-container {
+  background-color: white !important;
+}
+.tui-image-editor-controls {
+  visibility: hidden !important;
+  display: none;
+}
+.tui-image-editor-controls-logo {
+  visibility: hidden !important;
+  display: none;
+}
+.tui-image-editor-menu {
+  visibility: hidden !important;
+  display: none;
+}
+.tui-image-editor-wrap {
+  overflow: hidden !important;
+}
+.tui-image-editor-size-wrap {
+  display: flex !important;
+  flex-direction: column-reverse !important;
+  overflow: hidden !important;
+}
+.tui-image-editor-align-wrap {
+  display: flex !important;
+  flex-direction: column-reverse !important;
+  align-items: center !important;
+  overflow: hidden !important;
+}
+.tui-image-editor-canvas-container {
+  overflow: hidden !important;
+}
 .upper-canvas {
   border-radius: 0 0 34px 34px;
+  overflow: hidden !important;
 }
 .lower-canvas {
   border-radius: 0 0 34px 34px;
+  overflow: hidden !important;
 }
 
 .controls {
