@@ -1,60 +1,29 @@
-scale = [1..20]
-zoom = [
-    zoom in
+crop = [
+    crop
     magnify
-    zoom out
 ]
-direction.neutral = [
-    left
-    right
+direction = [
     top left
     top right
-    upper left
-    upper right
     bottom left
     bottom right
-    lower left
-    lower right
-    center
-    up
-    down
-    upward
-    downward
-]
-direction.verb = [
-    center
-    lift
-    raise
-    lower
 ]
 
 brightness = [light|brightness|luminosity]
+filters = [old image|classic|black and white]
 
-*undo that doesn't work
-*undo no i don't like that
 *undo go one step back
-*undo remove that
 
-*add_grayscale_filter [I want it|make it] black and white
-*add_grayscale_filter let's take off the colors
-*add_grayscale_filter add grayscale filter
+*add_filter make it $filters(filter)
 
-*add_sepia_filter add some [old image|classic] [flavor|style]
-*add_sepia_filter why don't you add [old image|classic] [flavor|style]
+*increase increase the {value of} $brightness(value)
+*decrease decrease the {value of} $brightness(value)
 
-*increase_luminosity add {[just a bit of|more]} $brightness
-*increase_luminosity increase {[just a bit of|more]} $brightness
-*increase_luminosity add {[just a bit of|more]} $brightness $scale(scale) percent
-*increase_luminosity increase {[just a bit of|more]} $brightness $scale(scale) percent
+*crop $crop [one step](direction)
+*crop $crop to the $direction(direction) corner
 
-*decrease_luminosity decrease $brightness
-*decrease_luminosity take off $brightness
-*decrease_luminosity decrease $brightness $scale(scale) percent
-*decrease_luminosity take off $brightness $scale(scale) percent
+# segmentation
+*add_filter make it $filters(filter) and *increase increase the {value of} $brightness(value)
+*increase increase the {value of} $brightness(value) and *add_filter make it $filters(filter)
 
-*crop $zoom(zoom) one step
-*crop what if we $zoom(zoom) [a bit|a little|slightly]
-*crop $zoom(zoom) to {the} $direction.neutral(direction) {corner}
-*crop $zoom(zoom) $direction.neutral(direction)
-*crop $zoom(zoom) {the image}
-*crop $direction.verb(direction) {[the image|the picture|a bit|a little|slightly|more]}
+*undo go one step back and *crop $crop one step
