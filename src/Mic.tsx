@@ -1,6 +1,6 @@
 import classNames from "classnames";
 import React from "react";
-import { ClientState } from "@speechly/browser-client";
+import { ClientState, stateToString } from "@speechly/browser-client";
 import { CircularProgress } from "@material-ui/core";
 
 let passiveSupported = false;
@@ -97,7 +97,8 @@ export class Mic extends React.Component<MicProps, {}> {
     const helpClassName = classNames("Microphone__help", "HelpText", {
       hidden: !clientConnected
     });
-
+    console.log("Client state: " + stateToString(this.props.clientState));
+    console.log(micClassName);
     return (
       <div className={rootClassName} ref={this.rootDiv}>
         <div style={{height: '50px'}}></div>

@@ -150,13 +150,11 @@ const Editor = (props: NavLinkProps) => {
                                     <section className="app">
                                         <i><b>Try out these:</b></i>
                                         <ul>
-                                            <li>I want it black and white (grayscale filter)</li>
-                                            <li>no I don't like that</li>
-                                            <li>why don't you add old image style (sepia filter)</li>
-                                            <li>take off light</li>
-                                            <li>add more luminosity</li>
-                                            <li>what if we magnify a bit</li>
-                                            <li>magnify to the bottom left corner</li>
+                                            <li>make it black and white</li>
+                                            <li>increase the light</li>
+                                            <li>decrease the light</li>
+                                            <li>magnify one step</li>
+                                            <li>magnify to the top left corner</li>
                                         </ul>
                                     </section>
                                 </div>
