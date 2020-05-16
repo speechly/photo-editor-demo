@@ -29,8 +29,6 @@ type IConnectionContextProps = {
 };
 type IConnectionContextState = {
   isTapping: boolean;
-  isClearConfirmOpen: boolean;
-  isInitialLoadComplete: boolean;
   recordButtonIsPressed: boolean;
   recordButtonIsPressedStarted?: Date;
   recordButtonIsPressedStopped?: Date;
@@ -40,8 +38,6 @@ type IConnectionContextState = {
   stopContext: (event: any) => void;
   startContext: (event: any) => void;
   closeClient: () => void;
-  clearList: () => void;
-  clearListConfirmed: () => void;
   clientState: ClientState;
   words: {};
   contextId: string;
@@ -50,15 +46,11 @@ type IConnectionContextState = {
 const defaultState: IConnectionContextState = {
   stopContext: (_event: Event) => {},
   startContext: (_event: Event) => {},
-  clearList: () => {},
-  clearListConfirmed: () => {},
   intents: [],
   entities: [],
   brightness: 0.0,
   recordButtonIsPressed: false,
   isTapping: false,
-  isClearConfirmOpen: false,
-  isInitialLoadComplete: false,
   clientState: ClientState.Disconnected,
   words: {},
   contextId: ""
@@ -74,10 +66,10 @@ class ConnectionContextProvider extends Component<IConnectionContextProps, IConn
       language: this.props.language
     };
 
-    // DO NOT COMMIT THIS
+    // REMOVE THIS ONCE PRODUCTION RELEASE
     clientBasicParams.url = "wss://staging.speechly.com/ws";
     clientBasicParams.debug = true;
-    // DO NOT COMMIT THIS
+    // REMOVE THIS ONCE PRODUCTION RELEASE
 
     console.log("Initializing client", clientBasicParams);
     this.client = new Client(clientBasicParams);
