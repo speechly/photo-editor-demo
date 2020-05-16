@@ -5,11 +5,10 @@ import {
   ClientState,
   Segment,
   SegmentChangeCallback,
-  TranscriptCallback,
   Entity as BrowserClientEntity,
   Intent as BrowserClientIntent
 } from "@speechly/browser-client";
-import ImageEditor from 'tui-image-editor';
+import {CanvasEditor} from './CanvasEditor';
 
 interface Entity extends BrowserClientEntity {
     contextId: string;
@@ -24,7 +23,7 @@ interface Intent extends BrowserClientIntent {
 type IConnectionContextProps = {
   appId: string;
   language: string;
-  imageEditor: ImageEditor;
+  imageEditor: CanvasEditor;
   transcriptDiv: HTMLDivElement;
 };
 type IConnectionContextState = {
@@ -75,7 +74,6 @@ class ConnectionContextProvider extends Component<IConnectionContextProps, IConn
     this.client = new Client(clientBasicParams);
     this.client.onSegmentChange(this.updateStateBySegmentChange);
     this.client.onStateChange(this.browserClientStateChanged);
-    //this.client.onTranscript(this.updateStateByTranscriptChange);
 
     this.state = defaultState;
   }
@@ -108,7 +106,8 @@ class ConnectionContextProvider extends Component<IConnectionContextProps, IConn
           "black and white": "grayscale"
         }
         if (filters.length > 0 && filters[0].value.toLowerCase() in filterEntity2canonical) {
-          this.applyFilter(filterEntity2canonical[filters[0].value.toLowerCase()])
+          const filterName = filterEntity2canonical[filters[0].value.toLowerCase()]
+          this.props.imageEditor.applyFilter(filterName);
         }
       } else if (intent.intent === "increase") {
         const values = segment.entities.filter(item => item.type === "value")
@@ -180,21 +179,6 @@ class ConnectionContextProvider extends Component<IConnectionContextProps, IConn
       contextId: this.state.contextId
     })
   };
-
-  updateStateByTranscriptChange: TranscriptCallback = (contextId: string, segmentId: number, word: Word) => {
-    let newWords = {};
-    if(this.state.contextId === contextId) {
-      newWords = this.state.words;
-    } else if (this.state.contextId !== "") {
-      //debugger
-    }
-    const index = word.index;
-    newWords[index] = word;
-    this.setState({ 
-      ...this.state,
-      words: newWords, 
-      contextId });
-  }
 
   changeLuminosity(scales, change) {
     if (scales.length > 0) {
