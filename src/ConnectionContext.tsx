@@ -89,15 +89,10 @@ class ConnectionContextProvider extends Component<IConnectionContextProps, IConn
     if (!segment.isFinal) {
       return
     }
-    const valueEntity2canonical = {
-      "light": "brightness",
-      "luminosity": "brightness",
-      "brightness": "brightness"
-    }
     if (segment.intent.intent.length > 0) {
       const intent = segment.intent;
       if (intent.intent === "undo") {
-        this.undoIntent()
+        this.props.imageEditor.undo()
       } else if (intent.intent === "add_filter") {
         const filters = segment.entities.filter(item => item.type === "filter")
         const filterEntity2canonical = {
@@ -108,68 +103,21 @@ class ConnectionContextProvider extends Component<IConnectionContextProps, IConn
         if (filters.length > 0 && filters[0].value.toLowerCase() in filterEntity2canonical) {
           const filterName = filterEntity2canonical[filters[0].value.toLowerCase()]
           this.props.imageEditor.applyFilter(filterName);
+          this.props.imageEditor.canvas.renderAll();
         }
       } else if (intent.intent === "increase") {
         const values = segment.entities.filter(item => item.type === "value")
-        if (values.length > 0 && values[0].value.toLowerCase() in valueEntity2canonical) {
-          const value = valueEntity2canonical[values[0].value.toLowerCase()];
-          if(value === "brightness") {
-            this.changeLuminosity([],  0.2)
-          }
-        }
+        this.changeLuminosity(0.2)
       } else if (intent.intent === "decrease") {
-        const values = this.state.entities.filter(item => item.type === "value")
-        if (values.length > 0 && values[0].value.toLowerCase() in valueEntity2canonical) {
-          const value = valueEntity2canonical[values[0].value.toLowerCase()];
-          if(value === "brightness") {
-            this.changeLuminosity([],  -0.2)
-          }
-        }
+        this.changeLuminosity(-0.2)
+      } else if (intent.intent === "move") {
+        const directions = segment.entities.filter(item => item.type === "direction");
+        if (directions.length > 0) {
+          const direction = directions[0].value.toLowerCase();
+          this.props.imageEditor.moveFocus(direction);
+        } 
       } else if (intent.intent === "crop") {
-        const directions = this.state.entities.filter(item => item.type === "direction")
-
-        const canvasSize = this.props.imageEditor.getCanvasSize();
-        const width = canvasSize.width;
-        const height = canvasSize.height;
-
-        if (directions.length === 0) {
-          this.cropTo(
-            Math.round(width * 0.1), 
-            Math.round(height * 0.1), 
-            Math.round(width * 0.8), 
-            Math.round(height * 0.8))
-        } else {
-          const direction = directions[0].value.toLowerCase()
-          switch (direction) {
-            case 'top left':
-              this.cropTo(
-                0, 
-                0, 
-                Math.round(width * 0.5), 
-                Math.round(height * 0.5))
-              break;
-            case 'top right':
-              this.cropTo(
-                width - Math.round(width * 0.5), 
-                0, 
-                Math.round(width * 0.5), 
-                Math.round(height * 0.5))
-              break
-            case 'bottom left':
-              this.cropTo(
-                0, 
-                height - Math.round(width * 0.5), 
-                Math.round(width * 0.5), 
-                Math.round(height * 0.5))
-              break
-            default:
-              this.cropTo(
-                Math.round(width * 0.1), 
-                Math.round(height * 0.1), 
-                Math.round(width * 0.8), 
-                Math.round(height * 0.8))
-          }
-        }
+        this.props.imageEditor.zoomIn();
       }
     }
     this.setState({
@@ -180,48 +128,17 @@ class ConnectionContextProvider extends Component<IConnectionContextProps, IConn
     })
   };
 
-  changeLuminosity(scales, change) {
-    if (scales.length > 0) {
-      change = parseInt(scales[0].value.toLowerCase(), 10);
-    }
+  changeLuminosity(change) {
     const newBrightness = this.state.brightness + change;
     this.setState({
       ...this.state,
       clientState: this.state.clientState,
       brightness: newBrightness
     })
-    this.applyFilter("brightness", {brightness: newBrightness})
-  }
-
-  undoIntent() {
-    const something2undo = !this.props.imageEditor.isEmptyUndoStack();
-    if (something2undo) {
-      this.props.imageEditor.undo().then((response) => {
-        console.log(response)
-        if (response.options) {
-          this.setState({
-            ...this.state,
-            brightness: this.state.brightness - (response.options.brightness || 0)
-          })
-        }
-      }).catch((error) => console.error(error))
-    }
-  }
-
-  cropTo(left: number, top: number, width: number, height: number) {
-    this.props.imageEditor.crop(
-      {left: left, top: top, width: width, height: height}
-    ).then((response) => console.log(response)).catch((error) => console.error(error))
+    this.props.imageEditor.applyFilter("brightness", {brightness: newBrightness});
+    this.props.imageEditor.canvas.renderAll();
   }
  
-  applyFilter = (filter: string, options = {}) => {
-    console.log("Add filter: " + filter)
-    console.log(options)
-    this.props.imageEditor.applyFilter(filter, options).then((response) => {
-      console.log(response)
-    }).catch((error) => console.error(error))
-  }
-
   startContext = (event: any) => {
     if (this.state.clientState === ClientState.Disconnected) {
       this.client.initialize((err?: Error) => {
@@ -299,13 +216,9 @@ class ConnectionContextProvider extends Component<IConnectionContextProps, IConn
     if(this.state.contextId === contextId) {
       newWords = this.state.words;
     }
-    /*if(!segmentId in newWords || typeof newWords[segmentId] !== 'object'){
-      newWords[segmentId] = {}
-    }*/
-  
+
     for (var i = 0; i < words.length; i++) {
       if(words[i] && words[i].index) {
-        //newWords[segmentId][words[i].index] = words[i];
         newWords[parseInt(words[i].index)] = words[i];
       }
     }

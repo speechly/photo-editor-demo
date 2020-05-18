@@ -96,10 +96,11 @@ const Editor = (props: NavLinkProps) => {
                                         <i><b>Try out these:</b></i>
                                         <ul>
                                             <li>make it black and white</li>
+                                            <li>make it classic</li>
                                             <li>increase the light</li>
-                                            <li>decrease the light</li>
                                             <li>magnify one step</li>
-                                            <li>magnify to the top left corner</li>
+                                            <li>move the focus up</li>
+                                            <li>move the focus down</li>
                                         </ul>
                                     </section>
                                 </div>
