@@ -1,0 +1,23 @@
+crop = [crop|magnify]
+direction = [left|right|up|down]
+filters = [old image|classic|black and white]
+
+*undo go one step back
+
+*add_filter make it $filters(filter)
+
+*increase increase the {value of} light
+*decrease decrease the {value of} light
+
+*crop $crop one step
+
+*move move the focus $direction(direction) {a bit}
+*move move the focus {slightly} $direction(direction)
+
+# segmentation
+*add_filter make it $filters(filter) and *increase increase the {value of} light
+*add_filter make it $filters(filter) and *decrease decrease the {value of} light
+*increase increase the {value of} light and *add_filter make it $filters(filter)
+*decrease decrease the {value of} light and *add_filter make it $filters(filter)
+
+*crop $crop one step and *move move the focus $direction(direction)

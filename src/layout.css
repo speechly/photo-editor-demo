@@ -1,0 +1,290 @@
+
+
+@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@500&display=swap');
+
+/* css reset */
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Quicksand', sans-serif;
+}
+
+.logo {
+  margin-top: auto;
+  margin-bottom: 30px;
+  width: 220px;
+}
+.app-logo {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  z-index: 99;
+}
+
+.app {
+  display: flex;
+  /* justify-content: center; */
+  align-items: center;
+  width: 100%;
+  flex-direction: column;
+}
+
+.app.intro {
+  background: url('img/onboard-background.png') center no-repeat;
+  background-size: cover;
+}
+
+.onboarding {
+  /* margin-top: auto; */
+  min-height: 300px;
+  max-width: 320px;
+  background: #fff;
+  border-radius:  30px 30px 0 0;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  min-height: 45vh;
+}
+.onboarding h1 {
+  margin-top: 20px;
+  margin-bottom: 20px;
+  font-size: 1.1rem;
+  text-align: center;
+  padding: 5px;
+}
+
+.btn {
+  padding: 15px;
+  text-align: center;
+  text-decoration: none;
+  display: block;
+  color: #fff;
+  background-image: linear-gradient(161deg, #1BE5B9 0%, #3FA0DB 100%);
+  box-shadow: 0 12px 10px 0 rgba(58,170,214,0.22);
+  border-radius: 10px;
+}
+
+.btn-disabled {
+  pointer-events: none;
+  background-color: #cccccc;
+  color: #666666;
+}
+
+.formRow {
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.gallery {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.thumbnail, .upload {
+  width: calc(100% / 3 - 10px);
+  margin: 5px;
+  border-radius: 10px;
+}
+.thumbnail img {
+  width: 100%;
+}
+.upload {
+  background-color: #F4F4F4;
+  background-image: url('img/image.svg');
+  background-position: center;
+  background-repeat: no-repeat;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+}
+
+/* App UI */
+
+
+/* upload button */
+.upload-btn-wrapper {
+  position: relative;
+  overflow: hidden;
+  /* display: inline-block; */
+  display: flex;
+}
+
+.upload-btn {
+  color: gray;
+  display: flex;
+  margin-top: auto;
+  padding: 8px 20px;
+  border:0;
+  background: none;
+  text-decoration: underline;
+  font-size: 14px;
+}
+
+.upload-btn-wrapper input[type=file] {
+  font-size: 100px;
+  position: absolute;
+  left: 0;
+  top: 0;
+  opacity: 0;
+}
+
+.photo canvas {
+  /* position: absolute;
+  top:0;
+  left: 0; */
+  position: relative;
+  width: 100%;
+  height: 90vh;
+  border-radius: 0 0 34px 34px !important;
+  z-index: -1;
+}
+.upper-canvas {
+  border-radius: 0 0 34px 34px !important;
+  overflow: hidden !important;
+}
+.lower-canvas {
+  border-radius: 0 0 34px 34px !important;
+  overflow: hidden !important;
+}
+
+.controls {
+  margin-top: -30px;
+}
+.controls button {
+  background-color: #fff;
+  margin: 0 10px;
+  position: relative;
+  z-index: 999;
+  width: 60px;
+  height: 60px;
+  border-radius: 100%;
+  border: none;
+
+  box-shadow: 0 2px 7px 0 rgba(0,0,0,0.07);
+}
+.controls button.micro {
+  width: 70px;
+  height: 70px;
+}
+
+.actionsHistory {
+  padding: 20px;
+  position: absolute;
+  top: 40vh;
+  color: #fff;
+  margin-top: -100px;
+}
+.actionsHistory::after {
+  background: rgba(0,0,0,0.40);
+  border-radius: 10px;
+  filter: blur(1);
+}
+
+/* Adjusting mobile devices */
+
+@media only screen and (max-width: 600px) {
+
+  /* Scaling the canvas to prevent scrolling */
+  .photo canvas  {
+    height: 80vh;
+  }
+  .app {
+    height: auto;
+  }
+  .app.intro {
+    /* height: 100vh; */
+    min-height: -webkit-fill-available
+  }
+  /*  */
+}
+
+.Microphone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 5vh !important;
+}
+.Microphone__loading {
+  position: absolute;
+}
+.Microphone__start {
+  border-radius: 1.5rem !important;
+  padding: 1rem !important;
+}
+.Microphone__button {
+  display: inline-flex;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+  cursor: pointer;
+  background: none;
+  border: none;
+  margin: auto;
+  transform-origin: bottom center;
+  width: 50%;
+}
+.Microphone__button svg {
+  width: 100%;
+  outline: none;
+  transition: all 0.5s;
+  transition-timing-function: ease-in-out;
+  transform-origin: bottom center;
+  overflow: visible;
+  max-height: 7vh;
+  fill: #302666;
+}
+.Microphone__button object {
+  margin-top: 2vh;
+  margin-bottom: 3vh;
+  vertical-align: middle;
+  display: table-cell;
+  width: 100%;
+  max-height: 5vh;
+}
+@media only screen and (min-width: 768px) {
+  .Microphone__button {
+    width: 28%;
+  }
+}
+@media only screen and (min-width: 1024px) {
+  .Microphone__button {
+    width: 20%;
+  }
+}
+.Microphone__button:hover svg {
+  transform: scale(1.1);
+}
+.Microphone__button__loading {
+  padding: 2vh 3vh !important;
+}
+.Microphone__button__active svg {
+  transform-origin: bottom center;
+  fill: #ff4d4d;
+  transform: scale(1.8) !important;
+}
+.Microphone__button__inactive {
+  transform: none;
+  opacity: 0.3;
+}
+.Microphone__button__inactive svg {
+  transition: none;
+}
+.Microphone__help {
+  display: inline-flex;
+  margin: 1vh;
+  text-align: center;
+  transition: all 0.5s;
+  /* smartphones, touchscreens */
+}
+@media (hover: none) and (pointer: coarse) {
+  .Microphone__help {
+    display: none;
+  }
+}
+.Microphone__help--hidden {
+  opacity: 0;
+}

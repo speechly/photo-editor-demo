@@ -1,0 +1,44 @@
+{
+  "homepage": "http://speechly.github.io/photo-editor-demo",
+  "name": "image-editor",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build"
+  },
+  "author": "Speechly",
+  "license": "ISC",
+  "dependencies": {
+    "@speechly/browser-client": "0.4.0",
+    "@types/classnames": "^2.2.10",
+    "@types/fabric": "^3.6.3",
+    "@types/react-router-dom": "^5.1.5",
+    "classnames": "^2.2.6",
+    "fabric": "3.6.0",
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1",
+    "react-router-dom": "^5.2.0",
+    "react-scripts": "^3.4.1"
+  },
+  "devDependencies": {
+    "@material-ui/core": "^4.9.9",
+    "gh-pages": "^2.2.0",
+    "typescript": "^3.8.3"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}
