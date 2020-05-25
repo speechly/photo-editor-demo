@@ -88,14 +88,21 @@ export class CanvasEditor {
         const name2filter = {
             'grayscale': f.Grayscale,
             'sepia': f.Sepia,
-            'brightness': f.Brightness,
-            'crop': f.Resize
+            'brightness': f.Brightness
         };
         if (filterName in name2filter) {
             // @ts-ignore
             let filter: fabric.IBaseFilter = (options) ? new name2filter[filterName](options) : new name2filter[filterName]();
             this.operationStack.push({type:"filter", operation: filter});
-            this.imageObject.filters?.push(filter)
+            const existingFilter = this.imageObject.filters?.filter((filter) => filterName in filter)
+            if (existingFilter && existingFilter?.length > 0) {
+                if(filterName === 'brightness' && options) {
+                    // @ts-ignore
+                    existingFilter[0].brightness = options?.brightness;
+                }
+            } else {
+                this.imageObject.filters?.push(filter)
+            }
             this.imageObject.applyFilters()
             this.canvas.renderAll()
         }
@@ -108,32 +115,6 @@ export class CanvasEditor {
         const centerY = window.innerHeight / 2;
         const centerX = window.innerWidth / 2;
         this.canvas.zoomToPoint(new fabric.Point(centerX,centerY), zoomValue);
-    }
-
-    moveFocus(direction: string) {
-        console.log(direction);
-        let moveX = 0;
-        let moveY = 0;
-        const step = 200;
-        switch (direction) {
-            case 'left':
-                moveX = step;
-                break;
-            case 'right':
-                moveX = -step;
-                break
-            case 'up':
-                moveY = step;
-                break
-            case 'down':
-                moveY = -step;
-                break
-            default:
-                break
-        }
-        this.operationStack.push({type: "move", operation: {moveX: moveX, moveY: moveY}})
-        const point = new fabric.Point(moveX, moveY);
-        this.canvas.relativePan(point);
     }
     
     undo() {
@@ -157,15 +138,6 @@ export class CanvasEditor {
                         const zooms = outerScope.operationStack.filter(item => item.type === "zoom").map(item => item.operation);
                         if (zooms.length > 0) {
                             newZoomValue += zooms.reduce((a,b) => a+b);
-                        }
-                        
-                        // RE-APPLY MOVE
-                        const moves = outerScope.operationStack.filter(item => item.type === "move").map(item => item.operation);
-                        if (moves.length > 0) {
-                            const moveX: number = moves.reduce((a,b) => a.moveX+b.moveX).moveX
-                            const moveY: number = moves.reduce((a,b) => a.moveY+b.moveY).moveY
-                            const point = new fabric.Point(moveX, moveY);
-                            outerScope.canvas.relativePan(point);
                         }
                     }
                     const centerY = window.innerHeight / 2;

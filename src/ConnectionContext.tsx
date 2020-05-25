@@ -101,14 +101,10 @@ class ConnectionContextProvider extends Component<IConnectionContextProps, IConn
         }
       } else if (intent.intent === "increase") {
         this.changeLuminosity(0.2)
+        return;
       } else if (intent.intent === "decrease") {
         this.changeLuminosity(-0.2)
-      } else if (intent.intent === "move") {
-        const directions = segment.entities.filter(item => item.type === "direction");
-        if (directions.length > 0) {
-          const direction = directions[0].value.toLowerCase();
-          this.props.imageEditor.moveFocus(direction);
-        } 
+        return;
       } else if (intent.intent === "crop") {
         this.props.imageEditor.zoomIn();
       }
@@ -128,6 +124,7 @@ class ConnectionContextProvider extends Component<IConnectionContextProps, IConn
       clientState: this.state.clientState,
       brightness: newBrightness
     })
+    console.log("Brightness: " + newBrightness)
     this.props.imageEditor.applyFilter("brightness", {brightness: newBrightness});
   }
  
@@ -210,11 +207,10 @@ class ConnectionContextProvider extends Component<IConnectionContextProps, IConn
     }
 
     for (var i = 0; i < words.length; i++) {
-      if(words[i] && words[i].index) {
+      if(words[i] && "index" in words[i]) {
         newWords[parseInt(words[i].index)] = words[i];
       }
     }
-
     this.setState({ 
       ...this.state,
       words: newWords, 

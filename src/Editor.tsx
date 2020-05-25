@@ -97,16 +97,17 @@ const Editor = (props: NavLinkProps) => {
                                             <li>make it black and white</li>
                                             <li>make it classic</li>
                                             <li>increase the light</li>
-                                            <li>magnify one step</li>
-                                            <li>move the focus up</li>
-                                            <li>move the focus down</li>
+                                            <li>reduce the light</li>
+                                            <li>magnify little bit</li>
+                                            <li>make it black and white and reduce the light</li>
+                                            <li>increase the light and make it classic</li>
                                         </ul>
                                     </section>
                                 </div>
                             );
                         }}
                     </ConnectionContext.Consumer>
-                </ConnectionContextProvider> */
+                </ConnectionContextProvider>
                 </section>
         </div>
     );
