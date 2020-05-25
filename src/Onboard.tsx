@@ -22,7 +22,6 @@ const Onboard = () => {
     };
     
     const buttonClass = (allowAudio) ? 'btn' : 'btn btn-disabled'
-
     const lastImage: string = images.imgPath.slice(-1)[0];
     const editorLinkParams = { 
         pathname: "/edit/", 
