@@ -1,14 +1,14 @@
 {
   "files": {
     "main.css": "/photo-editor-demo/static/css/main.2206351d.chunk.css",
-    "main.js": "/photo-editor-demo/static/js/main.cfeda9d9.chunk.js",
-    "main.js.map": "/photo-editor-demo/static/js/main.cfeda9d9.chunk.js.map",
+    "main.js": "/photo-editor-demo/static/js/main.c524c129.chunk.js",
+    "main.js.map": "/photo-editor-demo/static/js/main.c524c129.chunk.js.map",
     "runtime-main.js": "/photo-editor-demo/static/js/runtime-main.99e94e43.js",
     "runtime-main.js.map": "/photo-editor-demo/static/js/runtime-main.99e94e43.js.map",
     "static/js/2.1fc3c6ff.chunk.js": "/photo-editor-demo/static/js/2.1fc3c6ff.chunk.js",
     "static/js/2.1fc3c6ff.chunk.js.map": "/photo-editor-demo/static/js/2.1fc3c6ff.chunk.js.map",
     "index.html": "/photo-editor-demo/index.html",
-    "precache-manifest.7f0e2f6ddbe61159538e04a875050ac1.js": "/photo-editor-demo/precache-manifest.7f0e2f6ddbe61159538e04a875050ac1.js",
+    "precache-manifest.f86d40d5d59d6080b25f3bf7e14eca54.js": "/photo-editor-demo/precache-manifest.f86d40d5d59d6080b25f3bf7e14eca54.js",
     "service-worker.js": "/photo-editor-demo/service-worker.js",
     "static/css/main.2206351d.chunk.css.map": "/photo-editor-demo/static/css/main.2206351d.chunk.css.map",
     "static/js/2.1fc3c6ff.chunk.js.LICENSE.txt": "/photo-editor-demo/static/js/2.1fc3c6ff.chunk.js.LICENSE.txt",
@@ -19,6 +19,6 @@
     "static/js/runtime-main.99e94e43.js",
     "static/js/2.1fc3c6ff.chunk.js",
     "static/css/main.2206351d.chunk.css",
-    "static/js/main.cfeda9d9.chunk.js"
+    "static/js/main.c524c129.chunk.js"
   ]
 }
