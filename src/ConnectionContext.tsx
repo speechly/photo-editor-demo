@@ -34,6 +34,8 @@ type IConnectionContextState = {
   intents: Intent[];
   entities: Entity[];
   brightness: number;
+  contrast: number;
+  saturation: number;
   stopContext: (event: any) => void;
   startContext: (event: any) => void;
   closeClient: () => void;
@@ -48,6 +50,8 @@ const defaultState: IConnectionContextState = {
   intents: [],
   entities: [],
   brightness: 0.0,
+  contrast: 0.0,
+  saturation: 0,
   recordButtonIsPressed: false,
   isTapping: false,
   clientState: ClientState.Disconnected,
@@ -71,6 +75,27 @@ class ConnectionContextProvider extends Component<IConnectionContextProps, IConn
     this.client.onStateChange(this.browserClientStateChanged);
 
     this.state = defaultState;
+
+    this.change_fnc = {
+      'luminosity': this.changeLuminosity,
+      'brightness': this.changeLuminosity,
+      'light': this.changeLuminosity,
+      'contrast': this.changeContrast,
+      'saturation': this.changeSaturation,
+      'color': this.changeSaturation,
+      '': () => {}
+    };
+    this.filterEntity2canonical = {
+      "sepia": "sepia",
+      "vintage": "vintage",
+      "classic": "vintage",
+      "faded": "sepia",
+      "grayscale": "grayscale",
+      "black and white": "grayscale",
+      "kodachrome": "kodachrome",
+      "technicolor": "technicolor",
+      "polaroid": "polaroid"
+    }
   }
 
   browserClientStateChanged = (clientState: ClientState) => {
@@ -90,21 +115,24 @@ class ConnectionContextProvider extends Component<IConnectionContextProps, IConn
         this.props.imageEditor.undo()
       } else if (intent.intent === "add_filter") {
         const filters = segment.entities.filter(item => item.type === "filter")
-        const filterEntity2canonical = {
-          "old image": "sepia",
-          "classic": "sepia",
-          "black and white": "grayscale"
-        }
-        if (filters.length > 0 && filters[0].value.toLowerCase() in filterEntity2canonical) {
-          const filterName = filterEntity2canonical[filters[0].value.toLowerCase()]
+        if (filters.length > 0 && filters[0].value.toLowerCase() in this.filterEntity2canonical) {
+          const filterName = this.filterEntity2canonical[filters[0].value.toLowerCase()]
           this.props.imageEditor.applyFilter(filterName);
         }
       } else if (intent.intent === "increase") {
-        this.changeLuminosity(0.2)
-        return;
+        const properties = segment.entities.filter(item => item.type === "property")
+        const prop = (properties[0]) ? properties[0].value.toLowerCase() : ''
+        this.change_fnc[prop](1);
       } else if (intent.intent === "decrease") {
-        this.changeLuminosity(-0.2)
-        return;
+        const properties = segment.entities.filter(item => item.type === "property");
+        const prop = (properties[0]) ? properties[0].value.toLowerCase() : '';
+        this.change_fnc[prop](-1);
+      } else if (intent.intent === "move") {
+        const directions = segment.entities.filter(item => item.type === "direction");
+        if (directions.length > 0) {
+          const direction = directions[0].value.toLowerCase();
+          this.props.imageEditor.moveFocus(direction);
+        } 
       } else if (intent.intent === "crop") {
         this.props.imageEditor.zoomIn();
       }
@@ -113,12 +141,14 @@ class ConnectionContextProvider extends Component<IConnectionContextProps, IConn
       ...this.state,
       clientState: this.state.clientState,
       brightness: this.state.brightness,
+      contrast: this.state.contrast,
       contextId: this.state.contextId
     })
   };
 
-  changeLuminosity(change) {
-    const newBrightness = this.state.brightness + change;
+  private changeLuminosity = (changeSign) => {
+    console.log('changeLuminosity, state is: ' + this.state)
+    const newBrightness = this.state.brightness + changeSign * 0.2;
     this.setState({
       ...this.state,
       clientState: this.state.clientState,
@@ -127,7 +157,27 @@ class ConnectionContextProvider extends Component<IConnectionContextProps, IConn
     console.log("Brightness: " + newBrightness)
     this.props.imageEditor.applyFilter("brightness", {brightness: newBrightness});
   }
- 
+
+  private changeContrast = (changeSign) => {
+    const newContrast = this.state.contrast + changeSign * 0.1;
+    this.setState({
+      ...this.state,
+      clientState: this.state.clientState,
+      contrast: newContrast
+    })
+    this.props.imageEditor.applyFilter("contrast", {contrast: newContrast});
+  }
+
+  private changeSaturation = (changeSign) => {
+    const newSaturation = this.state.saturation + changeSign * 0.2;
+    this.setState({
+      ...this.state,
+      clientState: this.state.clientState,
+      saturation: newSaturation
+    })
+    this.props.imageEditor.applyFilter("saturation", {saturation: newSaturation});
+  }
+
   startContext = (event: any) => {
     if (this.state.clientState === ClientState.Disconnected) {
       this.client.initialize((err?: Error) => {

@@ -83,16 +83,100 @@ export class CanvasEditor {
         this.htmlCanvas.style.height = `${h}px - 60px`
     }
 
-    applyFilter(filterName: string, options?: Object) {
+  makeKodachromeFilter = () : fabric.IBaseFilter => {
+    console.log('at makeKodachromeFilter')
+      return new fabric.Image.filters.ColorMatrix({
+          matrix: [
+            1.1285582396593525, -0.3967382283601348, -0.03992559172921793, 0, 63.72958762196502,
+            -0.16404339962244616, 1.0835251566291304, -0.05498805115633132, 0, 24.732407896706203,
+            -0.16786010706155763, -0.5603416277695248, 1.6014850761964943, 0, 35.62982807460946,
+            0, 0, 0, 1, 0
+          ]
+      });
+  }
+
+  makeVintageFilter = () : fabric.IBaseFilter => {
+    console.log('at makeVintageFilter')
+      return new fabric.Image.filters.ColorMatrix({
+          matrix: [
+            0.62793,0.32021,-0.03965,0,0.03784,
+            0.02578,0.64411,0.03259,0,0.02926,
+            0.04660,-0.08512,0.52416,0,0.02023,
+            0,0,0,1,0
+          ]
+      });
+  }
+
+
+  makeTechnicolorFilter = () : fabric.IBaseFilter => {
+    console.log('at makeTechnicolorFilter')
+      return new fabric.Image.filters.ColorMatrix({
+          matrix: [
+            1.91252,-0.85453,-0.09155,0,0.04624,
+            -0.30878,1.76589,-0.10601,0,-0.27589,
+            -0.23110,-0.75018,1.84759,0,0.12137,
+            0,0,0,1,0
+          ]
+      });
+  }
+
+
+  makePolaroidFilter = () : fabric.IBaseFilter => {
+    console.log('at makePolaroidFilter')
+      return new fabric.Image.filters.ColorMatrix({
+          matrix: [
+            1.438,-0.062,-0.062,0,0,
+            -0.122,1.378,-0.122,0,0,
+            -0.016,-0.016,1.483,0,0,
+            0,0,0,1,0
+          ]
+      });
+  }
+
+
+  makeBaseFilter = (filterName: string, options?: Object) : fabric.IBaseFilter => {
+    console.log('at makeBaseFilter with ' + filterName)
+    if (filterName === 'grayscale') {
+      return new fabric.Image.filters.Grayscale();
+    }
+    else if (filterName === 'sepia') {
+      return new fabric.Image.filters.Sepia();
+    }
+    else if (filterName === 'brightness') {
+      const brightnessParam = options as {brightness: number}
+      return new fabric.Image.filters.Brightness(brightnessParam);
+    }
+    else if (filterName === 'contrast') {
+      const contrastParam = options as {contrast: number}
+      return new fabric.Image.filters.Contrast(contrastParam);
+    }
+    else if (filterName === 'saturation') {
+      const saturationParam = options as {saturation: number}
+      console.log('saturation param is ' + saturationParam.saturation)
+      return new fabric.Image.filters.Saturation(saturationParam);
+    }
+    // we should never get here, though
+    return new fabric.Image.filters.Grayscale();
+  }
+
+  applyFilter(filterName: string, options?: Object) {
+        console.log('applyFilter called')
         const f = fabric.Image.filters;
         const name2filter = {
-            'grayscale': f.Grayscale,
-            'sepia': f.Sepia,
-            'brightness': f.Brightness
+          'brightness': (opt: Object) => this.makeBaseFilter('brightness', opt),
+          'contrast': (opt: Object) => this.makeBaseFilter('contrast', opt),
+          'saturation': (opt: Object) => this.makeBaseFilter('saturation', opt),
+          'kodachrome': this.makeKodachromeFilter,
+          'grayscale': () => this.makeBaseFilter('grayscale'),
+          'sepia': () => this.makeBaseFilter('sepia'),
+          'vintage': this.makeVintageFilter,
+          'technicolor': this.makeTechnicolorFilter,
+          'polaroid': this.makePolaroidFilter
         };
-        if (filterName in name2filter) {
+      if (filterName in name2filter) {
+            console.log('filter name is ' + filterName)
             // @ts-ignore
-            let filter: fabric.IBaseFilter = (options) ? new name2filter[filterName](options) : new name2filter[filterName]();
+            let filter: fabric.IBaseFilter = (options) ? name2filter[filterName](options) : name2filter[filterName]();
             this.operationStack.push({type:"filter", operation: filter});
             const existingFilter = this.imageObject.filters?.filter((filter) => filterName in filter)
             if (existingFilter && existingFilter?.length > 0) {
