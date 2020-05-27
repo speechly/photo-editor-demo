@@ -1,17 +1,27 @@
-crop = [crop|magnify]
-filters = [old image|classic|black and white]
+filter = [vintage|faded|sepia|classic|kodachrome|technicolor|polaroid|black and white|grayscale]
+property = [brightness | luminosity | light | contrast | saturation | color]
+increase_cmd = [increase|add more|more]
+decrease_cmd = [decrease|reduce|less]
+add_filter_cmd = [add | activate | make it | make it look | make it like]
+del_filter_cmd = [remove | deactivate]
 
-*add_filter make it $filters(filter)
+*undo [go back | go one step back | undo | i don't want that | no i don't want that | cancel that | cancel]
 
-*increase increase the light
-*decrease reduce the light
+*add_filter $add_filter_cmd $filter(filter)
+*remove_filter $del_filter_cmd $filter(filter)
 
-*crop $crop little bit
+*increase $increase_cmd $property(property)
+*decrease $decrease_cmd $property(property)
 
-# segmentation
-*add_filter make it $filters(filter) and *increase increase the light
-*add_filter make it $filters(filter) and *decrease reduce the light
-*increase increase the light and *add_filter make it $filters(filter)
-*decrease reduce the light and *add_filter make it $filters(filter)
+*increase $increase_cmd $property(property) {and} *increase $increase_cmd $property(property)
+*decrease $decrease_cmd $property(property) {and} *decrease $decrease_cmd $property(property)
 
-*undo go one step back
+*increase $increase_cmd $property(property) {and} *decrease $decrease_cmd $property(property)
+*decrease $decrease_cmd $property(property) {and} *increase $increase_cmd $property(property)
+
+*add_filter $add_filter_cmd $filter(filter) {and} *increase $increase_cmd $property(property)
+*add_filter $add_filter_cmd $filter(filter) {and} *decrease $decrease_cmd $property(property)
+
+*increase $increase_cmd $property(property) {and} *add_filter $add_filter_cmd $filter(filter)
+*decrease $decrease_cmd $property(property) {and} *add_filter $add_filter_cmd $filter(filter)
+
