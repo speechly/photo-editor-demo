@@ -5,35 +5,21 @@ import {
   ClientState,
   Segment,
   SegmentChangeCallback,
-  Entity as BrowserClientEntity,
-  Intent as BrowserClientIntent
 } from "@speechly/browser-client";
 import {CanvasEditor} from './CanvasEditor';
 
-interface Entity extends BrowserClientEntity {
-    contextId: string;
-    segmentId: number;
-}
-
-interface Intent extends BrowserClientIntent {
-  contextId: string;
-  segmentId: number;
-}
-  
 type IConnectionContextProps = {
   appId: string;
   language: string;
   imageEditor: CanvasEditor;
   transcriptDiv: HTMLDivElement;
 };
+
 type IConnectionContextState = {
   isTapping: boolean;
   recordButtonIsPressed: boolean;
   recordButtonIsPressedStarted?: Date;
   recordButtonIsPressedStopped?: Date;
-  intents: Intent[];
-  entities: Entity[];
-  brightness: number;
   stopContext: (event: any) => void;
   startContext: (event: any) => void;
   closeClient: () => void;
@@ -45,9 +31,6 @@ type IConnectionContextState = {
 const defaultState: IConnectionContextState = {
   stopContext: (_event: Event) => {},
   startContext: (_event: Event) => {},
-  intents: [],
-  entities: [],
-  brightness: 0.0,
   recordButtonIsPressed: false,
   isTapping: false,
   clientState: ClientState.Disconnected,
@@ -57,188 +40,201 @@ const defaultState: IConnectionContextState = {
 
 const ConnectionContext = React.createContext<IConnectionContextState>(defaultState);
 class ConnectionContextProvider extends Component<IConnectionContextProps, IConnectionContextState> {
-  constructor(props: any) {
-    super(props);
+    constructor(props: any) {
+        super(props);
 
-    const clientBasicParams = {
-      appId: this.props.appId,
-      language: this.props.language
+        const clientBasicParams = {
+            appId: this.props.appId,
+            language: this.props.language
+        };
+
+        console.log("Initializing client", clientBasicParams);
+        this.client = new Client(clientBasicParams);
+        this.client.onSegmentChange(this.updateStateBySegmentChange);
+        this.client.onStateChange(this.browserClientStateChanged);
+
+        this.state = defaultState;
+
+        this.entity2canonical = {
+            "sepia": "sepia",
+            "vintage": "vintage",
+            "classic": "vintage",
+            "faded": "sepia",
+            "grayscale": "grayscale",
+            "black and white": "grayscale",
+            "kodachrome": "kodachrome",
+            "technicolor": "technicolor",
+            "polaroid": "polaroid",
+            'luminosity': 'brightness',
+            'brightness': 'brightness',
+            'light': 'brightness',
+            'contrast': 'contrast',
+            'saturation': 'saturation',
+            'color': 'saturation'
+        }
+    }
+
+    browserClientStateChanged = (clientState: ClientState) => {
+        this.setState({
+            ...this.state,
+            clientState });
     };
 
-    console.log("Initializing client", clientBasicParams);
-    this.client = new Client(clientBasicParams);
-    this.client.onSegmentChange(this.updateStateBySegmentChange);
-    this.client.onStateChange(this.browserClientStateChanged);
-
-    this.state = defaultState;
-  }
-
-  browserClientStateChanged = (clientState: ClientState) => {
-    this.setState({ 
-      ...this.state,
-      clientState });
-  };
-
-  updateStateBySegmentChange: SegmentChangeCallback = (segment: Segment) => {
-    this.updateWords(segment.words, segment.contextId, segment.id);
-    if (!segment.isFinal) {
-      return
-    }
-    if (segment.intent.intent.length > 0) {
-      const intent = segment.intent;
-      if (intent.intent === "undo") {
-        this.props.imageEditor.undo()
-      } else if (intent.intent === "add_filter") {
-        const filters = segment.entities.filter(item => item.type === "filter")
-        const filterEntity2canonical = {
-          "old image": "sepia",
-          "classic": "sepia",
-          "black and white": "grayscale"
+    updateStateBySegmentChange: SegmentChangeCallback = (segment: Segment) => {
+        this.updateWords(segment.words, segment.contextId, segment.id);
+        if (!segment.isFinal) {
+            return
         }
-        if (filters.length > 0 && filters[0].value.toLowerCase() in filterEntity2canonical) {
-          const filterName = filterEntity2canonical[filters[0].value.toLowerCase()]
-          this.props.imageEditor.applyFilter(filterName);
+        if (segment.intent.intent.length > 0) {
+            const intent = segment.intent;
+            if (intent.intent === "undo") {
+                this.props.imageEditor.undo();
+            } else if (intent.intent === "add_filter") {
+                const filterName = this.collectEntity(segment.entities, "filter");
+                if (filterName in this.entity2canonical) {
+                    this.props.imageEditor.enableFilter(this.entity2canonical[filterName]);
+                }
+            } else if (intent.intent === "remove_filter") {
+                const filterName = this.collectEntity(segment.entities, "filter");
+                if (filterName in this.entity2canonical) {
+                    this.props.imageEditor.disableFilter(this.entity2canonical[filterName]);
+                }
+            } else if (intent.intent === "increase") {
+                const propertyName = this.collectEntity(segment.entities, "property");
+                if (propertyName in this.entity2canonical) {
+                    this.props.imageEditor.incrementProperty(this.entity2canonical[propertyName]);
+                }
+            } else if (intent.intent === "decrease") {
+                const propertyName = this.collectEntity(segment.entities, "property");
+                if (propertyName in this.entity2canonical) {
+                    this.props.imageEditor.decrementProperty(this.entity2canonical[propertyName]);
+                }
+            }
         }
-      } else if (intent.intent === "increase") {
-        this.changeLuminosity(0.2)
-        return;
-      } else if (intent.intent === "decrease") {
-        this.changeLuminosity(-0.2)
-        return;
-      } else if (intent.intent === "crop") {
-        this.props.imageEditor.zoomIn();
-      }
-    }
-    this.setState({
-      ...this.state,
-      clientState: this.state.clientState,
-      brightness: this.state.brightness,
-      contextId: this.state.contextId
-    })
-  };
+    };
 
-  changeLuminosity(change) {
-    const newBrightness = this.state.brightness + change;
-    this.setState({
-      ...this.state,
-      clientState: this.state.clientState,
-      brightness: newBrightness
-    })
-    console.log("Brightness: " + newBrightness)
-    this.props.imageEditor.applyFilter("brightness", {brightness: newBrightness});
-  }
- 
-  startContext = (event: any) => {
-    if (this.state.clientState === ClientState.Disconnected) {
-      this.client.initialize((err?: Error) => {
-        if (err) {
-          console.error("Error initializing Speechly client:", err);
-          return;
+    private collectEntity = (entityList, entityType: string) => {
+        const entities = entityList.filter(item => item.type === entityType);
+        if (entities.length > 0) {
+            // In our case there should only be a single entity of a given type in a segment,
+            // so we just return the first item on the list if it exsists.
+            return entities[0].value.toLowerCase();
         }
-      });
-      return;
+        return '';
     }
 
-    if (this.state.clientState === ClientState.Connected) {
-      this.client.startContext((err?: Error) => {
-        if (err) {
-          console.error("Could not start recording", err);
-          return;
+    startContext = (event: any) => {
+        if (this.state.clientState === ClientState.Disconnected) {
+            this.client.initialize((err?: Error) => {
+                if (err) {
+                    console.error("Error initializing Speechly client:", err);
+                    return;
+                }
+            });
+            return;
         }
-      });
-    }
-  };
 
-  stopContext = (event: any) => {
-    this.toggleRecordButtonState(false);
-    const { recordButtonIsPressedStarted, recordButtonIsPressedStopped } = this.state;
-
-    this.stopRecording(event);
-    if (recordButtonIsPressedStarted && recordButtonIsPressedStopped) {
-      this.setState({
-        ...this.state,
-        isTapping: Boolean(recordButtonIsPressedStopped.getTime() - recordButtonIsPressedStarted.getTime() < 1000)
-      });
-    }
-  };
-
-  toggleRecordButtonState = (recordButtonIsPressed: boolean) => {
-    this.setState({
-      ...this.state,
-      isTapping: false,
-      recordButtonIsPressed,
-      recordButtonIsPressedStarted: recordButtonIsPressed ? new Date() : this.state.recordButtonIsPressedStarted,
-      recordButtonIsPressedStopped: !recordButtonIsPressed ? new Date() : this.state.recordButtonIsPressedStopped
-    });
-  };
-
-  stopRecording = (event: any) => {
-    if (this.state.clientState !== ClientState.Recording) {
-      return;
-    }
-
-    this.client.stopContext((err?: Error) => {
-      if (err) {
-        console.error("Could not stop recording", err);
-        return;
-      }
-    });
-  };
-
-  readonly closeClient = () => {
-    if (this.state.clientState < ClientState.Connected) {
-      return;
-    }
-    try {
-      this.client.close((err?: Error) => {
-        if (err !== undefined) {
-          console.error("Could not close client", err);
+        if (this.state.clientState === ClientState.Connected) {
+            this.client.startContext((err?: Error) => {
+                if (err) {
+                    console.error("Could not start recording", err);
+                    return;
+                }
+            });
         }
-      });
-    } catch (err) {
-      console.error("Could not close client", err);
-    }
-  };
+    };
 
-  updateWords = (words: Word[], contextId: string, segmentId: number) => {
-    let newWords = {};
-    if(this.state.contextId === contextId) {
-      newWords = this.state.words;
-    }
+    stopContext = (event: any) => {
+        this.toggleRecordButtonState(false);
+        const { recordButtonIsPressedStarted, recordButtonIsPressedStopped } = this.state;
 
-    for (var i = 0; i < words.length; i++) {
-      if(words[i] && "index" in words[i]) {
-        newWords[parseInt(words[i].index)] = words[i];
-      }
-    }
-    this.setState({ 
-      ...this.state,
-      words: newWords, 
-      contextId });
+        this.stopRecording(event);
+        if (recordButtonIsPressedStarted && recordButtonIsPressedStopped) {
+            this.setState({
+                ...this.state,
+                isTapping: Boolean(recordButtonIsPressedStopped.getTime() - recordButtonIsPressedStarted.getTime() < 1000)
+            });
+        }
+    };
 
-    const transcriptDiv = this.props.transcriptDiv;
-    if(newWords) {
-      const html = Object.keys(newWords).map(key => parseInt(key)).sort()
-        .map((key) => (newWords[key].isFinal ? `<b>${newWords[key].value}</b>` : newWords[key].value))
-        .join(" "); 
-      transcriptDiv.innerHTML = html;
-    }
-  };
+    toggleRecordButtonState = (recordButtonIsPressed: boolean) => {
+        this.setState({
+            ...this.state,
+            isTapping: false,
+            recordButtonIsPressed,
+            recordButtonIsPressedStarted: recordButtonIsPressed ? new Date() : this.state.recordButtonIsPressedStarted,
+            recordButtonIsPressedStopped: !recordButtonIsPressed ? new Date() : this.state.recordButtonIsPressedStopped
+        });
+    };
 
-  render() {
-    return (
-      <ConnectionContext.Provider
-        value={{
-          ...this.state,
-          startContext: this.startContext,
-          stopContext: this.stopContext,
-          closeClient: this.closeClient
-        }}
-      >
-        {this.props.children}
-      </ConnectionContext.Provider>
-    );
-  }
+    stopRecording = (event: any) => {
+        if (this.state.clientState !== ClientState.Recording) {
+            return;
+        }
+
+        this.client.stopContext((err?: Error) => {
+            if (err) {
+                console.error("Could not stop recording", err);
+                return;
+            }
+        });
+    };
+
+    readonly closeClient = () => {
+        if (this.state.clientState < ClientState.Connected) {
+            return;
+        }
+        try {
+            this.client.close((err?: Error) => {
+                if (err !== undefined) {
+                    console.error("Could not close client", err);
+                }
+            });
+        } catch (err) {
+            console.error("Could not close client", err);
+        }
+    };
+
+    updateWords = (words: Word[], contextId: string, segmentId: number) => {
+        let newWords = {};
+        if(this.state.contextId === contextId) {
+            newWords = this.state.words;
+        }
+
+        for (var i = 0; i < words.length; i++) {
+            if(words[i] && words[i].index) {
+                newWords[parseInt(words[i].index)] = words[i];
+            }
+        }
+
+        this.setState({
+            ...this.state,
+            words: newWords,
+            contextId });
+
+        const transcriptDiv = this.props.transcriptDiv;
+        if(newWords) {
+            const html = Object.keys(newWords).map(key => parseInt(key)).sort()
+                  .map((key) => (newWords[key].isFinal ? `<b>${newWords[key].value}</b>` : newWords[key].value))
+                  .join(" "); 
+            transcriptDiv.innerHTML = html;
+        }
+    };
+
+    render() {
+        return (
+                <ConnectionContext.Provider
+            value={{
+                ...this.state,
+                startContext: this.startContext,
+                stopContext: this.stopContext,
+                closeClient: this.closeClient
+            }}
+                >
+                {this.props.children}
+            </ConnectionContext.Provider>
+        );
+    }
 }
 
 export default ConnectionContext;
