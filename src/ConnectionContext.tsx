@@ -7,6 +7,7 @@ import {
   SegmentChangeCallback,
 } from "@speechly/browser-client";
 import {CanvasEditor} from './CanvasEditor';
+import updateImageEditorBySegmentChange from './speechlyTools';
 
 type IConnectionContextProps = {
   appId: string;
@@ -48,74 +49,16 @@ class ConnectionContextProvider extends Component<IConnectionContextProps, IConn
         this.client.onStateChange(this.browserClientStateChanged);
 
         this.state = defaultState;
-
-        this.entity2canonical = {
-            "sepia": "sepia",
-            "vintage": "vintage",
-            "classic": "vintage",
-            "faded": "sepia",
-            "grayscale": "grayscale",
-            "black and white": "grayscale",
-            "kodachrome": "kodachrome",
-            "technicolor": "technicolor",
-            "polaroid": "polaroid",
-            'luminosity': 'brightness',
-            'brightness': 'brightness',
-            'light': 'brightness',
-            'contrast': 'contrast',
-            'saturation': 'saturation',
-            'color': 'saturation'
-        }
     }
 
     browserClientStateChanged = (clientState: ClientState) => {
-        this.setState({
-            ...this.state,
-            clientState });
+        this.setState({...this.state, clientState });
     };
 
     updateStateBySegmentChange: SegmentChangeCallback = (segment: Segment) => {
         this.updateWords(segment.words, segment.contextId, segment.id);
-        if (!segment.isFinal) {
-            return
-        }
-        if (segment.intent.intent.length > 0) {
-            const intent = segment.intent;
-            if (intent.intent === "undo") {
-                this.props.imageEditor.undo();
-            } else if (intent.intent === "add_filter") {
-                const filterName = this.collectEntity(segment.entities, "filter");
-                if (filterName in this.entity2canonical) {
-                    this.props.imageEditor.enableFilter(this.entity2canonical[filterName]);
-                }
-            } else if (intent.intent === "remove_filter") {
-                const filterName = this.collectEntity(segment.entities, "filter");
-                if (filterName in this.entity2canonical) {
-                    this.props.imageEditor.disableFilter(this.entity2canonical[filterName]);
-                }
-            } else if (intent.intent === "increase") {
-                const propertyName = this.collectEntity(segment.entities, "property");
-                if (propertyName in this.entity2canonical) {
-                    this.props.imageEditor.incrementProperty(this.entity2canonical[propertyName]);
-                }
-            } else if (intent.intent === "decrease") {
-                const propertyName = this.collectEntity(segment.entities, "property");
-                if (propertyName in this.entity2canonical) {
-                    this.props.imageEditor.decrementProperty(this.entity2canonical[propertyName]);
-                }
-            }
-        }
+        updateImageEditorBySegmentChange(segment, this.props.imageEditor);
     };
-
-    private collectEntity = (entityList, entityType: string) => {
-        const entities = entityList.filter(item => item.type === entityType);
-        if (entities.length > 0) {
-            // In our case there should only be a single entity of a given type in a segment,
-            // so we just return the first item on the list if it exsists.
-            return entities[0].value.toLowerCase();
-        }
-        return '';
-    }
 
     updateWords = (words: Word[], contextId: string, segmentId: number) => {
       let newWords = {};
