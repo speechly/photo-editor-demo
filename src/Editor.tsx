@@ -95,12 +95,12 @@ const Editor = (props: NavLinkProps) => {
                                         <i><b>Try out these:</b></i>
                                         <ul>
                                             <li>make it black and white</li>
-                                            <li>make it classic</li>
-                                            <li>increase the light</li>
-                                            <li>reduce the light</li>
-                                            <li>magnify little bit</li>
-                                            <li>make it black and white and reduce the light</li>
-                                            <li>increase the light and make it classic</li>
+                                            <li>add technicolor</li>
+                                            <li>deactivate black and white</li>
+                                            <li>add more light</li>
+                                            <li>less light</li>
+                                            <li>make it polaroid and reduce contrast</li>
+                                            <li>increase saturation and make it classic</li>
                                         </ul>
                                     </section>
                                 </div>

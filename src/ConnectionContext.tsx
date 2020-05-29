@@ -16,10 +16,6 @@ type IConnectionContextProps = {
 };
 
 type IConnectionContextState = {
-  isTapping: boolean;
-  recordButtonIsPressed: boolean;
-  recordButtonIsPressedStarted?: Date;
-  recordButtonIsPressedStopped?: Date;
   stopContext: (event: any) => void;
   startContext: (event: any) => void;
   closeClient: () => void;
@@ -31,8 +27,6 @@ type IConnectionContextState = {
 const defaultState: IConnectionContextState = {
   stopContext: (_event: Event) => {},
   startContext: (_event: Event) => {},
-  recordButtonIsPressed: false,
-  isTapping: false,
   clientState: ClientState.Disconnected,
   words: {},
   contextId: ""
@@ -123,6 +117,32 @@ class ConnectionContextProvider extends Component<IConnectionContextProps, IConn
         return '';
     }
 
+    updateWords = (words: Word[], contextId: string, segmentId: number) => {
+      let newWords = {};
+      if(this.state.contextId === contextId) {
+          newWords = this.state.words;
+      }
+
+      for (var i = 0; i < words.length; i++) {
+          if(words[i] && "index" in words[i]) {
+              newWords[parseInt(words[i].index)] = words[i];
+          }
+      }
+
+      this.setState({
+          ...this.state,
+          words: newWords,
+          contextId });
+
+      const transcriptDiv = this.props.transcriptDiv;
+      if(newWords) {
+          const html = Object.keys(newWords).map(key => parseInt(key)).sort()
+                .map((key) => (newWords[key].isFinal ? `<b>${newWords[key].value}</b>` : newWords[key].value))
+                .join(" "); 
+          transcriptDiv.innerHTML = html;
+      }
+    };
+
     startContext = (event: any) => {
         if (this.state.clientState === ClientState.Disconnected) {
             this.client.initialize((err?: Error) => {
@@ -145,29 +165,6 @@ class ConnectionContextProvider extends Component<IConnectionContextProps, IConn
     };
 
     stopContext = (event: any) => {
-        this.toggleRecordButtonState(false);
-        const { recordButtonIsPressedStarted, recordButtonIsPressedStopped } = this.state;
-
-        this.stopRecording(event);
-        if (recordButtonIsPressedStarted && recordButtonIsPressedStopped) {
-            this.setState({
-                ...this.state,
-                isTapping: Boolean(recordButtonIsPressedStopped.getTime() - recordButtonIsPressedStarted.getTime() < 1000)
-            });
-        }
-    };
-
-    toggleRecordButtonState = (recordButtonIsPressed: boolean) => {
-        this.setState({
-            ...this.state,
-            isTapping: false,
-            recordButtonIsPressed,
-            recordButtonIsPressedStarted: recordButtonIsPressed ? new Date() : this.state.recordButtonIsPressedStarted,
-            recordButtonIsPressedStopped: !recordButtonIsPressed ? new Date() : this.state.recordButtonIsPressedStopped
-        });
-    };
-
-    stopRecording = (event: any) => {
         if (this.state.clientState !== ClientState.Recording) {
             return;
         }
@@ -192,32 +189,6 @@ class ConnectionContextProvider extends Component<IConnectionContextProps, IConn
             });
         } catch (err) {
             console.error("Could not close client", err);
-        }
-    };
-
-    updateWords = (words: Word[], contextId: string, segmentId: number) => {
-        let newWords = {};
-        if(this.state.contextId === contextId) {
-            newWords = this.state.words;
-        }
-
-        for (var i = 0; i < words.length; i++) {
-            if(words[i] && words[i].index) {
-                newWords[parseInt(words[i].index)] = words[i];
-            }
-        }
-
-        this.setState({
-            ...this.state,
-            words: newWords,
-            contextId });
-
-        const transcriptDiv = this.props.transcriptDiv;
-        if(newWords) {
-            const html = Object.keys(newWords).map(key => parseInt(key)).sort()
-                  .map((key) => (newWords[key].isFinal ? `<b>${newWords[key].value}</b>` : newWords[key].value))
-                  .join(" "); 
-            transcriptDiv.innerHTML = html;
         }
     };
 
