@@ -1,4 +1,4 @@
-import React, {useLayoutEffect, useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {NavLinkProps} from "react-router-dom";
 import {Location} from "history";
 import './layout.css';
