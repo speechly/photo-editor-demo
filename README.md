@@ -1,9 +1,10 @@
+# <a href="https://www.speechly.com/"><img src="https://www.speechly.com/images/logo.png" height="100" alt="Speechly"></a>
 
 ## Speechly photo editor example
 
 [![License](http://img.shields.io/:license-mit-blue.svg)](LICENSE)
 
-This is an simple photo editing application which can edit the brightness, add and remove filters and crop images by using voice.
+This is an simple photo editing application which can edit the brightness, add and remove filters and crop images by using voice. You can follow [our tutorial](https://www.speechly.com/blog/building-a-web-application-with-a-voice-user-interface/) to see how this was built.
 
 Built with:
 - [speechly-browser-client](https://github.com/speechly/browser-client)
