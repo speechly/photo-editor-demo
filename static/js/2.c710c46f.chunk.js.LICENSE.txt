@@ -19,6 +19,8 @@ object-assign
 
 /*! Fabric.js Copyright 2008-2015, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
+/*! http://mths.be/base64 v0.1.0 by @mathias | MIT license */
+
 /**
  * A better abstraction over CSS.
  *

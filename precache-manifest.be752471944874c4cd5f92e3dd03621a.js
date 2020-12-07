@@ -1,23 +1,23 @@
 self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
-    "revision": "b3e496b9a79b8e4f2426cb13cb11bcae",
+    "revision": "0af24e8f4e21bc0f55f385255201af67",
     "url": "/photo-editor-demo/index.html"
   },
   {
-    "revision": "ea6376b2c24357171327",
+    "revision": "77179064417d6b4741bb",
     "url": "/photo-editor-demo/static/css/main.2206351d.chunk.css"
   },
   {
-    "revision": "6fb4dfa16234d708bac0",
-    "url": "/photo-editor-demo/static/js/2.35c93332.chunk.js"
+    "revision": "ae83d529c162387ba0eb",
+    "url": "/photo-editor-demo/static/js/2.c710c46f.chunk.js"
   },
   {
-    "revision": "565b7988fbf155b49bd527a971c54a15",
-    "url": "/photo-editor-demo/static/js/2.35c93332.chunk.js.LICENSE.txt"
+    "revision": "6e2f08d5d8090e21b5b3d4aa3b7c8367",
+    "url": "/photo-editor-demo/static/js/2.c710c46f.chunk.js.LICENSE.txt"
   },
   {
-    "revision": "ea6376b2c24357171327",
-    "url": "/photo-editor-demo/static/js/main.9fef19a4.chunk.js"
+    "revision": "77179064417d6b4741bb",
+    "url": "/photo-editor-demo/static/js/main.fec2f592.chunk.js"
   },
   {
     "revision": "7cca49042929348e3d42",
