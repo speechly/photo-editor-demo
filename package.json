@@ -18,7 +18,7 @@
     "@types/fabric": "^3.6.3",
     "@types/react-router-dom": "^5.1.5",
     "classnames": "^2.2.6",
-    "fabric": "3.6.0",
+    "fabric": "5.2.4",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-router-dom": "^5.2.0",
